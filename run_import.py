@@ -1,3 +1,4 @@
+''' Entry point for import.'''
 from base_mysql_importer import BaseMysqlImporter
 
 def main():
