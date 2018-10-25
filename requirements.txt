@@ -1,5 +1,4 @@
 #mysql-connector
-#dataset
 jupyter
 matplotlib
 pandas
