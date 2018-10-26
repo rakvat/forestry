@@ -13,17 +13,20 @@ class BaseMysqlImporter:
         'Export Quantity': 'export'
     }
 
-    def __init__(self):
+    def __init__(self, file=FILE, database_name='forestry'):
         self.db_cursor = None
         self.db_connection = None
+        self.file = file
+        self.database_name = database_name
 
     def run(self):
         self.setup_db()
         generator = self.csv_rows_generator()
         self.insert_in_dataset(generator)
+        self.close_db()
 
     def csv_rows_generator(self):
-        with open(self.FILE, 'r') as csvfile:
+        with open(self.file, 'r') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
                 yield row
@@ -72,19 +75,23 @@ class BaseMysqlImporter:
 
         self.db_connection.commit()
 
+    def connect_db(self, database=None):
+        self.db_connection = sql.connect(
+            host='localhost', user='root', password='', charset='utf8mb4', database=database
+        )
+        self.db_cursor = self.db_connection.cursor()
+
+    def close_db(self):
+        self.db_cursor.close()
+        self.db_connection.close()
+
     def setup_db(self):
-        self.db_connection = sql.connect(
-            host='localhost', user='root', password='', charset='utf8mb4'
-        )
-        self.db_cursor = self.db_connection.cursor()
-        self.db_cursor.execute('CREATE DATABASE IF NOT EXISTS forestry_base')
+        self.connect_db()
+        query = 'CREATE DATABASE IF NOT EXISTS %s' % (self.database_name)
+        self.db_cursor.execute(query)
         self.db_connection.commit()
-
-        self.db_connection = sql.connect(
-            host='localhost', user='root', password='', charset='utf8mb4', database='forestry_base'
-        )
-        self.db_cursor = self.db_connection.cursor()
-
+        self.close_db()
+        self.connect_db(database=self.database_name)
         self.setup_tables()
 
     def setup_tables(self):
