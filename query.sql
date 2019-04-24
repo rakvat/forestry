@@ -1,0 +1,1 @@
+SELECT countries.name AS country, products.name AS product, year, import, import_value, export, export_value FROM import_export LEFT JOIN products ON import_export.product_id=products.id LEFT JOIN countries ON import_export.country_id=countries.id WHERE product_id=1675 AND country_id=67 ORDER BY year;

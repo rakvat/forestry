@@ -1,6 +1,2 @@
-#mysql-connector
-jupyter
-matplotlib
-pandas
-numpy
+mysql-connector
 pylint
