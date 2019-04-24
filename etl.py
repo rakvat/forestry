@@ -1,54 +1,35 @@
 import bonobo
 import time
-
+from extractor import Extractor
 
 def extract():
-    """Placeholder, change, rename, remove... """
-    time.sleep(5)
-    yield 'hello'
-    time.sleep(5)
-    yield 'world'
-
+    extractor = Extractor()
+    for row in extractor.generate():
+        yield row
 
 def transform(*args):
-    """Placeholder, change, rename, remove... """
-    time.sleep(5)
-    yield tuple(
-        map(str.title, args)
-    )
-
+    yield { 'year': args[2], 'import': args[3], 'export': args[5] }
 
 def load(*args):
-    """Placeholder, change, rename, remove... """
-    time.sleep(5)
-    print(*args)
-
+    line = args[0]
+    print("Year {}: Import {} - Export {}".format(line['year'], line['import'], line['export']))
 
 def get_graph(**options):
-    """
-    This function builds the graph that needs to be executed.
-
-    :return: bonobo.Graph
-
-    """
     graph = bonobo.Graph()
-    graph.add_chain(extract, transform, load)
+
+    graph.add_chain(
+        extract,
+        bonobo.Limit(10),
+        #bonobo.PrettyPrinter(),
+        transform,
+        load,
+    )
 
     return graph
 
 
 def get_services(**options):
-    """
-    This function builds the services dictionary, which is a simple dict of names-to-implementation used by bonobo
-    for runtime injection.
-
-    It will be used on top of the defaults provided by bonobo (fs, http, ...). You can override those defaults, or just
-    let the framework define them. You can also define your own services and naming is up to you.
-
-    :return: dict
-    """
     return {}
-
 
 # The __main__ block actually execute the graph.
 if __name__ == '__main__':
